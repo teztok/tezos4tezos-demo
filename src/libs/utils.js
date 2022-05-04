@@ -6,6 +6,10 @@ export function shortenTzAddress(address) {
 }
 
 export function getUsername(data, field) {
+  if (!data[`${field}_address`]) {
+    return '';
+  }
+
   return get(data, `${field}_profile.twitter`) ? `@${get(data, `${field}_profile.twitter`)}` : shortenTzAddress(data[`${field}_address`]);
 }
 

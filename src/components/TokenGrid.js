@@ -7,7 +7,7 @@ export default function TokenGrid({ tokens }) {
     <Box sx={{ overflowY: 'scroll' }}>
       <ImageList variant="masonry" cols={6} gap={8}>
         {tokens.map((token) => (
-          <Token token={token} key={token.token_id} />
+          <Token token={token} key={`${token.fa2_address}_${token.token_id}`} />
         ))}
       </ImageList>
     </Box>
