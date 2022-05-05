@@ -1,7 +1,8 @@
-import ImageListItem from '@mui/material/ImageListItem';
-import ImageListItemBar from '@mui/material/ImageListItemBar';
-import IconButton from '@mui/material/IconButton';
-import InfoIcon from '@mui/icons-material/Info';
+import Box from '@mui/material/Box';
+import Chip from '@mui/material/Chip';
+import Link from '@mui/material/Link';
+import Typography from '@mui/material/Typography';
+import Stack from '@mui/material/Stack';
 import { ipfsToCloudflareUri, getUsername, formatTz } from '../libs/utils';
 
 function getTokenLink(token) {
@@ -37,31 +38,61 @@ function getTokenLink(token) {
 
 export default function Token({ token }) {
   return (
-    <ImageListItem key={token.token_id}>
-      <img src={ipfsToCloudflareUri(token.display_uri)} alt={token.name} loading="lazy" />
-      <ImageListItemBar
-        title={token.name}
-        subtitle={
-          <>
-            <a href={getTokenLink(token)}>#{token.token_id}</a>
-            <br />
-            platform: {token.platform === 'HEN' ? 'TEIA' : token.platform}
-            <br />
-            artist: {getUsername(token, 'artist')}
-            <br />
-            price: {formatTz(token.price)}
-            <br />
-            editions: {token.editions}
-            <br />
-            sales: {token.sales_count}
-          </>
-        }
-        actionIcon={
-          <IconButton sx={{ color: 'rgba(255, 255, 255, 0.54)' }} aria-label={`info about ${token.name}`}>
-            <InfoIcon />
-          </IconButton>
-        }
-      />
-    </ImageListItem>
+    <>
+      <Box className="item" key={token.token_id}>
+        <Link href={getTokenLink(token)}>
+          <Box
+            sx={{
+              overflow: 'hidden',
+              position: 'relative',
+            }}
+          >
+            <img
+              className="artwork"
+              src={ipfsToCloudflareUri(token.display_uri)}
+              alt={token.name}
+              loading="lazy"
+              style={{
+                display: 'block',
+                width: '100%',
+              }}
+            />
+            {token.platform != null && (
+              <Chip
+                label={token.platform === 'HEN' ? 'TEIA' : token.platform}
+                color="secondary"
+                size="small"
+                sx={{
+                  pointerEvents: 'none',
+                  position: 'absolute',
+                  top: 20,
+                  left: 20,
+                }}
+              />
+            )}
+          </Box>
+          <Box sx={{ p: 3 }}>
+            <Stack direction="row" spacing={2} alignItems="center">
+              <Typography variant="body2" component="p">
+                <strong>Editions</strong>
+                <br />
+                {token.editions}
+              </Typography>
+              <Typography variant="body2" component="p">
+                <strong>Sales</strong>
+                <br />
+                {token.sales_count}
+              </Typography>
+              <Typography variant="body2" component="p">
+                <strong>Price</strong>
+                <br />
+                {formatTz(token.price)}
+              </Typography>
+              <Chip label={getUsername(token, 'artist')} color="primary" size="small" sx={{ ml: 'auto !important' }} />
+            </Stack>
+          </Box>
+        </Link>
+      </Box>
+    </>
   );
 }

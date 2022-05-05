@@ -1,0 +1,31 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600&display=swap');
+
+body {
+  font-family: Poppins;
+  font-weight: 400;
+}
+
+.item {
+  overflow: hidden;
+  border-radius: 4px;
+  background-color: #111827;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
+  transition: background-color 0.2s ease-out, box-shadow 0.4s ease-out, transform 0.2s ease-out;
+}
+
+.artwork {
+  transition: transform 0.3s ease-out;
+  transform-origin: center;
+}
+
+@media (hover: hover) {
+  .item:hover {
+    background-color: #1c253a;
+    box-shadow: 0 35px 50px rgba(0, 0, 0, 1);
+    transform: translate3d(0, -10px, 0);
+  }
+
+  .item:hover .artwork {
+    transform: scale(1.05);
+  }
+}
