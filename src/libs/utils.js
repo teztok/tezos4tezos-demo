@@ -15,7 +15,7 @@ export function getUsername(data, field) {
 
 export function formatTz(amount) {
   if (!isNumber(amount)) {
-    return '-';
+    return '–';
   }
 
   const amountFixed = (amount / 1000000).toFixed(2);
