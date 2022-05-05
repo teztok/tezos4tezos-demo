@@ -8,12 +8,15 @@ import CircularProgress from '@mui/material/CircularProgress';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import Button from '@mui/material/Button';
+import Link from '@mui/material/Link';
 import FormControl from '@mui/material/FormControl';
+import GitHubIcon from '@mui/icons-material/GitHub';
 import Select from '@mui/material/Select';
 import Stats from './components/Stats';
 import laggy from './libs/swr-laggy-middleware';
 import PlatformFilters from './components/PlatformFilters';
 import TokenGrid from './components/TokenGrid';
+import theme from './theme';
 import './App.css';
 
 const TAG = process.env.REACT_APP_TAG || 'tezos4tezos';
@@ -174,34 +177,56 @@ function App() {
             mb: 4,
           }}
         >
-          <Stack direction="row" spacing={6} alignItems="center" sx={{ width: '75%' }}>
+          <Stack
+            direction={{ tablet: 'row', tablet_short: 'row', tablet_portrait: 'column', mobile: 'column' }}
+            alignItems={{ tablet: 'center', tablet_short: 'center', tablet_portrait: 'start', mobile: 'start' }}
+            spacing={6}
+            sx={{ width: '75%' }}
+          >
             <Typography variant="h1" component="h1" color="primary">
               #{TAG}
             </Typography>
-            <Stats
-              totalTokensCount={totalTokensCount}
-              totalArtistsCount={totalArtistsCount}
-              totalSalesCount={totalSalesCount}
-              totalSalesVolume={totalSalesVolume}
-            />
+            <Box sx={{ mt: '0 !important' }}>
+              <Stats
+                totalTokensCount={totalTokensCount}
+                totalArtistsCount={totalArtistsCount}
+                totalSalesCount={totalSalesCount}
+                totalSalesVolume={totalSalesVolume}
+              />
+            </Box>
           </Stack>
-          <FormControl sx={{ m: 1, mr: 4, ml: 'auto', minWidth: 120 }} size="small">
-            <InputLabel>Sort by</InputLabel>
-            <Select value={orderColumn} label="Sort by" onChange={(ev) => setOrderColumn(ev.target.value)}>
-              <MenuItem dense value="sales_count">
-                Sales
-              </MenuItem>
-              <MenuItem dense value="minted_at">
-                Minted
-              </MenuItem>
-            </Select>
-          </FormControl>
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              mr: 4,
+              width: '25%',
+              [theme.breakpoints.down('tablet_portrait')]: {
+                display: 'none !important',
+              },
+            }}
+          >
+            <FormControl sx={{ m: 1, mr: 4, ml: 'auto', minWidth: 120 }} size="small">
+              <InputLabel>Sort by</InputLabel>
+              <Select value={orderColumn} label="Sort by" onChange={(ev) => setOrderColumn(ev.target.value)}>
+                <MenuItem dense value="sales_count">
+                  Sales
+                </MenuItem>
+                <MenuItem dense value="minted_at">
+                  Minted
+                </MenuItem>
+              </Select>
+            </FormControl>
+            <Link href="https://github.com/teztok/tezos4tezos-demo">
+              <GitHubIcon />
+            </Link>
+          </Box>
         </Box>
         <PlatformFilters
           filters={[
             { label: 'ALL', value: '__ALL__', count: totalTokensCount },
             { label: 'TEIA', value: 'HEN', count: teiaTokenCount },
-            { label: 'OBJKT.COM', value: 'OBJKT', count: objktTokenCount },
+            { label: 'OBJKT', value: 'OBJKT', count: objktTokenCount },
             { label: 'VERSUM', value: 'VERSUM', count: versumTokenCount },
             { label: 'FXHASH', value: 'FXHASH', count: fxhashTokenCount },
             { label: '8BIDOU', value: '8BIDOU', count: eightbidouTokenCount },
@@ -212,9 +237,20 @@ function App() {
           }}
           platform={platform}
         />
-
         <TokenGrid tokens={tokens} />
-        {!(tokens.length % DEFAULT_LIMIT) && <Button onClick={() => setLimit(limit + DEFAULT_LIMIT)}>more</Button>}
+        {!(tokens.length % DEFAULT_LIMIT) && (
+          <Box
+            sx={{
+              mb: 10,
+              width: '100%',
+              textAlign: 'center',
+            }}
+          >
+            <Button onClick={() => setLimit(limit + DEFAULT_LIMIT)} variant="outlined" size="normal">
+              Load more
+            </Button>
+          </Box>
+        )}
       </Box>
     </div>
   );

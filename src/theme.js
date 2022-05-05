@@ -5,6 +5,7 @@ const theme = createTheme({
     values: {
       mobile: 0,
       tablet_portrait: 750,
+      tablet_short: 900,
       tablet: 1050,
       laptop: 1400,
       desktop: 1700,
@@ -44,6 +45,9 @@ const theme = createTheme({
 
 theme.typography.h1 = {
   fontSize: '2.8rem',
+  [theme.breakpoints.down('tablet_portrait')]: {
+    fontSize: '1.6rem',
+  },
 };
 
 theme.typography.body2 = {

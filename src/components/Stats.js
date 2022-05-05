@@ -2,10 +2,17 @@ import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import { formatTz } from '../libs/utils';
+import theme from '../theme';
 
 export default function Stats({ totalTokensCount, totalArtistsCount, totalSalesCount, totalSalesVolume }) {
   return (
-    <Box>
+    <Box
+      sx={{
+        [theme.breakpoints.down('tablet_portrait')]: {
+          mt: 2,
+        },
+      }}
+    >
       <Stack direction="row" spacing={4} alignItems="center">
         <Typography variant="body2" component="p" color="primary">
           <strong>Artists</strong>

@@ -52,14 +52,14 @@ export default function Token({ token }) {
   return (
     <>
       <Box className="item" key={token.token_id}>
-        <Link href={getTokenLink(token)}>
+        <Link href={getTokenLink(token)} target="_blank">
           <Box
             sx={{
               overflow: 'hidden',
               position: 'relative',
             }}
           >
-            {!isLoaded && <Skeleton variant="rectangular" width={400} height={300} />}
+            {!isLoaded && <Skeleton variant="rectangular" width={800} height={300} />}
             <img
               onLoad={() => setIsLoaded(true)}
               className="artwork"
@@ -105,7 +105,12 @@ export default function Token({ token }) {
                 <br />
                 {formatTz(token.price)}
               </Typography>
-              <Chip label={getUsername(token, 'artist')} color="primary" size="small" sx={{ ml: 'auto !important' }} />
+              <Chip
+                label={getUsername(token, 'artist')}
+                color="primary"
+                size="small"
+                sx={{ pointerEvents: 'none', ml: 'auto !important' }}
+              />
             </Stack>
           </Box>
         </Link>
