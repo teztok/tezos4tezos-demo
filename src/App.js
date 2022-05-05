@@ -18,6 +18,7 @@ import './App.css';
 
 const TAG = process.env.REACT_APP_TAG || 'tezos4tezos';
 const TEZTOK_API = 'https://api.teztok.com/v1/graphql';
+const DEFAULT_LIMIT = 30;
 
 const TokensByTagsQuery = gql`
   query TokensByTags($tags: [String], $orderBy: tokens_order_by!, $platform: String_comparison_exp!, $limit: Int!) {
@@ -122,7 +123,7 @@ function useTokensByTags(tags, orderColumn, platform, limit) {
 
 function App() {
   const [orderColumn, setOrderColumn] = useState('minted_at');
-  const [limit, setLimit] = useState(30);
+  const [limit, setLimit] = useState(DEFAULT_LIMIT);
   const [platform, setPlatform] = useState('__ALL__');
   const {
     tokens,
@@ -206,6 +207,7 @@ function App() {
             { label: '8BIDOU', value: '8BIDOU', count: eightbidouTokenCount },
           ]}
           onChange={(value) => {
+            setLimit(DEFAULT_LIMIT);
             setPlatform(value);
           }}
           platform={platform}
