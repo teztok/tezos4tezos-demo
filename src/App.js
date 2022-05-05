@@ -214,7 +214,7 @@ function App() {
         />
 
         <TokenGrid tokens={tokens} />
-        <Button onClick={() => setLimit(limit + 20)}>more</Button>
+        {!(tokens.length % DEFAULT_LIMIT) && <Button onClick={() => setLimit(limit + DEFAULT_LIMIT)}>more</Button>}
       </Box>
     </div>
   );

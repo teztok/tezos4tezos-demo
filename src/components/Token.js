@@ -59,6 +59,7 @@ export default function Token({ token }) {
               alt={token.name}
               loading="lazy"
               style={{
+                position: isLoaded ? 'relative' : 'absolute',
                 display: 'block',
                 width: '100%',
                 opacity: isLoaded ? 1 : 0,
