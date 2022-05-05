@@ -7,9 +7,11 @@ import Stack from '@mui/material/Stack';
 import CircularProgress from '@mui/material/CircularProgress';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
+import Button from '@mui/material/Button';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import Stats from './components/Stats';
+import laggy from './libs/swr-laggy-middleware';
 import PlatformFilters from './components/PlatformFilters';
 import TokenGrid from './components/TokenGrid';
 import './App.css';
@@ -18,10 +20,11 @@ const TAG = process.env.REACT_APP_TAG || 'tezos4tezos';
 const TEZTOK_API = 'https://api.teztok.com/v1/graphql';
 
 const TokensByTagsQuery = gql`
-  query TokensByTags($tags: [String], $orderBy: tokens_order_by!, $platform: String_comparison_exp!) {
+  query TokensByTags($tags: [String], $orderBy: tokens_order_by!, $platform: String_comparison_exp!, $limit: Int!) {
     stats: tokens_aggregate(where: { tags: { tag: { _in: $tags } }, display_uri: { _is_null: false } }) {
       aggregate {
         count
+        artists_count: count(distinct: true, columns: artist_address)
         sum {
           sales_count
           sales_volume
@@ -61,6 +64,7 @@ const TokensByTagsQuery = gql`
     }
     tokens(
       where: { tags: { tag: { _in: $tags } }, editions: { _gt: "0" }, display_uri: { _is_null: false }, platform: $platform }
+      limit: $limit
       order_by: [$orderBy]
     ) {
       fa2_address
@@ -83,19 +87,27 @@ const TokensByTagsQuery = gql`
   }
 `;
 
-function useTokensByTags(tags, orderColumn, platform) {
+function useTokensByTags(tags, orderColumn, platform, limit) {
   const { data, error, isValidating } = useSWR(
-    ['/tokens-by-tag', ...tags, orderColumn, platform],
-    () => request(TEZTOK_API, TokensByTagsQuery, { tags, platform: platform ? { _eq: platform } : {}, orderBy: { [orderColumn]: 'desc' } }),
+    ['/tokens-by-tag', ...tags, orderColumn, platform, limit],
+    () =>
+      request(TEZTOK_API, TokensByTagsQuery, {
+        tags,
+        platform: platform === '__ALL__' ? {} : { _eq: platform },
+        limit,
+        orderBy: { [orderColumn]: 'desc' },
+      }),
     {
       revalidateIfStale: false,
       revalidateOnFocus: false,
+      use: [laggy],
     }
   );
 
   return {
     tokens: data && data.tokens,
     totalTokensCount: data && data.stats.aggregate.count,
+    totalArtistsCount: data && data.stats.aggregate.artists_count,
     totalSalesCount: data && data.stats.aggregate.sum.sales_count,
     totalSalesVolume: data && data.stats.aggregate.sum.sales_volume,
     teiaTokenCount: data && data.stats_teia.aggregate.count,
@@ -109,20 +121,22 @@ function useTokensByTags(tags, orderColumn, platform) {
 }
 
 function App() {
-  const [orderColumn, setOrderColumn] = useState('sales_count');
-  const [platform, setPlatform] = useState(null);
+  const [orderColumn, setOrderColumn] = useState('minted_at');
+  const [limit, setLimit] = useState(30);
+  const [platform, setPlatform] = useState('__ALL__');
   const {
     tokens,
     totalSalesCount,
     totalSalesVolume,
     totalTokensCount,
+    totalArtistsCount,
     teiaTokenCount,
     objktTokenCount,
     versumTokenCount,
     eightbidouTokenCount,
     fxhashTokenCount,
     error,
-  } = useTokensByTags([TAG, `#${TAG}`], orderColumn, platform);
+  } = useTokensByTags([TAG, `#${TAG}`], orderColumn, platform, limit);
 
   if (error) {
     return <pre>{JSON.stringify(error, null, 2)}</pre>;
@@ -163,11 +177,16 @@ function App() {
             <Typography variant="h1" component="h1" color="primary">
               #{TAG}
             </Typography>
-            <Stats totalSalesCount={totalSalesCount} totalSalesVolume={totalSalesVolume} />
+            <Stats
+              totalTokensCount={totalTokensCount}
+              totalArtistsCount={totalArtistsCount}
+              totalSalesCount={totalSalesCount}
+              totalSalesVolume={totalSalesVolume}
+            />
           </Stack>
           <FormControl sx={{ m: 1, mr: 4, ml: 'auto', minWidth: 120 }} size="small">
             <InputLabel>Sort by</InputLabel>
-            <Select value={type} label="Sort by" onChange={handleSorting}>
+            <Select value={orderColumn} label="Sort by" onChange={(ev) => setOrderColumn(ev.target.value)}>
               <MenuItem dense value="sales_count">
                 Sales
               </MenuItem>
@@ -179,7 +198,7 @@ function App() {
         </Box>
         <PlatformFilters
           filters={[
-            { label: 'ALL', value: null, count: totalTokensCount },
+            { label: 'ALL', value: '__ALL__', count: totalTokensCount },
             { label: 'TEIA', value: 'HEN', count: teiaTokenCount },
             { label: 'OBJKT.COM', value: 'OBJKT', count: objktTokenCount },
             { label: 'VERSUM', value: 'VERSUM', count: versumTokenCount },
@@ -193,6 +212,7 @@ function App() {
         />
 
         <TokenGrid tokens={tokens} />
+        <Button onClick={() => setLimit(limit + 20)}>more</Button>
       </Box>
     </div>
   );

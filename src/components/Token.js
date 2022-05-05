@@ -1,8 +1,10 @@
+import { useState } from 'react';
 import Box from '@mui/material/Box';
 import Chip from '@mui/material/Chip';
 import Link from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
 import Stack from '@mui/material/Stack';
+import Skeleton from '@mui/material/Skeleton';
 import { ipfsToCloudflareUri, getUsername, formatTz } from '../libs/utils';
 
 function getTokenLink(token) {
@@ -37,6 +39,8 @@ function getTokenLink(token) {
 }
 
 export default function Token({ token }) {
+  const [isLoaded, setIsLoaded] = useState(false);
+
   return (
     <>
       <Box className="item" key={token.token_id}>
@@ -47,7 +51,9 @@ export default function Token({ token }) {
               position: 'relative',
             }}
           >
+            {!isLoaded && <Skeleton variant="rectangular" width={400} height={300} />}
             <img
+              onLoad={() => setIsLoaded(true)}
               className="artwork"
               src={ipfsToCloudflareUri(token.display_uri)}
               alt={token.name}
@@ -55,6 +61,7 @@ export default function Token({ token }) {
               style={{
                 display: 'block',
                 width: '100%',
+                opacity: isLoaded ? 1 : 0,
               }}
             />
             {token.platform != null && (

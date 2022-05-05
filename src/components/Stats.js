@@ -3,17 +3,19 @@ import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import { formatTz } from '../libs/utils';
 
-export default function Stats({ totalSalesCount, totalSalesVolume }) {
+export default function Stats({ totalTokensCount, totalArtistsCount, totalSalesCount, totalSalesVolume }) {
   return (
     <Box>
       <Stack direction="row" spacing={4} alignItems="center">
         <Typography variant="body2" component="p" color="primary">
           <strong>Artists</strong>
-          <br />0
+          <br />
+          {totalArtistsCount}
         </Typography>
         <Typography variant="body2" component="p" color="primary">
           <strong>Artworks</strong>
-          <br />0
+          <br />
+          {totalTokensCount}
         </Typography>
         <Typography variant="body2" component="p" color="primary">
           <strong>Sales</strong>
