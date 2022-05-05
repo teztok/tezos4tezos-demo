@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import useSWR from 'swr';
 import { request, gql } from 'graphql-request';
+import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import ButtonGroup from '@mui/material/ButtonGroup';
-import laggy from './libs/swr-laggy-middleware';
 import Stats from './components/Stats';
+import PlatformFilters from './components/PlatformFilters';
 import TokenGrid from './components/TokenGrid';
 
 import './App.css';
@@ -13,16 +14,51 @@ const TAG = process.env.REACT_APP_TAG || 'tezos4tezos';
 const TEZTOK_API = 'https://api.teztok.com/v1/graphql';
 
 const TokensByTagsQuery = gql`
-  query TokensByTags($tags: [String], $orderBy: tokens_order_by!) {
-    stats: tokens_aggregate(where: { tags: { tag: { _in: $tags } } }) {
+  query TokensByTags($tags: [String], $orderBy: tokens_order_by!, $platform: String_comparison_exp!) {
+    stats: tokens_aggregate(where: { tags: { tag: { _in: $tags } }, display_uri: { _is_null: false } }) {
       aggregate {
+        count
         sum {
           sales_count
           sales_volume
         }
       }
     }
-    tokens(where: { tags: { tag: { _in: $tags } }, editions: { _gt: "0" }, display_uri: { _is_null: false } }, order_by: [$orderBy]) {
+    stats_teia: tokens_aggregate(where: { tags: { tag: { _in: $tags } }, display_uri: { _is_null: false }, platform: { _eq: "HEN" } }) {
+      aggregate {
+        count
+      }
+    }
+    stats_objkt: tokens_aggregate(where: { tags: { tag: { _in: $tags } }, display_uri: { _is_null: false }, platform: { _eq: "OBJKT" } }) {
+      aggregate {
+        count
+      }
+    }
+    stats_versum: tokens_aggregate(
+      where: { tags: { tag: { _in: $tags } }, display_uri: { _is_null: false }, platform: { _eq: "VERSUM" } }
+    ) {
+      aggregate {
+        count
+      }
+    }
+    stats_8bidou: tokens_aggregate(
+      where: { tags: { tag: { _in: $tags } }, display_uri: { _is_null: false }, platform: { _eq: "8BIDOU" } }
+    ) {
+      aggregate {
+        count
+      }
+    }
+    stats_fxhash: tokens_aggregate(
+      where: { tags: { tag: { _in: $tags } }, display_uri: { _is_null: false }, platform: { _eq: "FXHASH" } }
+    ) {
+      aggregate {
+        count
+      }
+    }
+    tokens(
+      where: { tags: { tag: { _in: $tags } }, editions: { _gt: "0" }, display_uri: { _is_null: false }, platform: $platform }
+      order_by: [$orderBy]
+    ) {
       fa2_address
       token_id
       platform
@@ -39,26 +75,30 @@ const TokensByTagsQuery = gql`
       mime_type
       minted_at
       price
-      objkt_artist_collection_id
     }
   }
 `;
 
-function useTokensByTags(tags, orderColumn) {
+function useTokensByTags(tags, orderColumn, platform) {
   const { data, error, isValidating } = useSWR(
-    ['/tokens-by-tag', ...tags, orderColumn],
-    () => request(TEZTOK_API, TokensByTagsQuery, { tags, orderBy: { [orderColumn]: 'desc' } }),
+    ['/tokens-by-tag', ...tags, orderColumn, platform],
+    () => request(TEZTOK_API, TokensByTagsQuery, { tags, platform: platform ? { _eq: platform } : {}, orderBy: { [orderColumn]: 'desc' } }),
     {
       revalidateIfStale: false,
       revalidateOnFocus: false,
-      use: [laggy],
     }
   );
 
   return {
     tokens: data && data.tokens,
+    totalTokensCount: data && data.stats.aggregate.count,
     totalSalesCount: data && data.stats.aggregate.sum.sales_count,
     totalSalesVolume: data && data.stats.aggregate.sum.sales_volume,
+    teiaTokenCount: data && data.stats_teia.aggregate.count,
+    objktTokenCount: data && data.stats_objkt.aggregate.count,
+    versumTokenCount: data && data.stats_versum.aggregate.count,
+    eightbidouTokenCount: data && data.stats_8bidou.aggregate.count,
+    fxhashTokenCount: data && data.stats_fxhash.aggregate.count,
     error,
     isLoading: isValidating,
   };
@@ -66,7 +106,19 @@ function useTokensByTags(tags, orderColumn) {
 
 function App() {
   const [orderColumn, setOrderColumn] = useState('sales_count');
-  const { tokens, totalSalesCount, totalSalesVolume, error } = useTokensByTags([TAG, `#${TAG}`], orderColumn);
+  const [platform, setPlatform] = useState(null);
+  const {
+    tokens,
+    totalSalesCount,
+    totalSalesVolume,
+    totalTokensCount,
+    teiaTokenCount,
+    objktTokenCount,
+    versumTokenCount,
+    eightbidouTokenCount,
+    fxhashTokenCount,
+    error,
+  } = useTokensByTags([TAG, `#${TAG}`], orderColumn, platform);
 
   if (error) {
     return <pre>{JSON.stringify(error, null, 2)}</pre>;
@@ -80,22 +132,40 @@ function App() {
     <div className="App">
       <h1>#{TAG}</h1>
       <Stats totalSalesCount={totalSalesCount} totalSalesVolume={totalSalesVolume} />
-      <ButtonGroup size="large">
-        <Button
-          onClick={() => {
-            setOrderColumn('sales_count');
+      <Box>
+        <ButtonGroup size="large">
+          <Button
+            onClick={() => {
+              setOrderColumn('sales_count');
+            }}
+          >
+            By Sales {orderColumn === 'sales_count' ? '*' : ''}
+          </Button>
+          <Button
+            onClick={() => {
+              setOrderColumn('minted_at');
+            }}
+          >
+            By Creation {orderColumn === 'minted_at' ? '*' : ''}
+          </Button>
+        </ButtonGroup>
+      </Box>
+      <Box>
+        <PlatformFilters
+          filters={[
+            { label: 'ALL', value: null, count: totalTokensCount },
+            { label: 'TEIA', value: 'HEN', count: teiaTokenCount },
+            { label: 'OBJKT.COM', value: 'OBJKT', count: objktTokenCount },
+            { label: 'VERSUM', value: 'VERSUM', count: versumTokenCount },
+            { label: 'FXHASH', value: 'FXHASH', count: fxhashTokenCount },
+            { label: '8BIDOU', value: '8BIDOU', count: eightbidouTokenCount },
+          ]}
+          onChange={(value) => {
+            setPlatform(value);
           }}
-        >
-          By Sales {orderColumn === 'sales_count' ? '*' : ''}
-        </Button>
-        <Button
-          onClick={() => {
-            setOrderColumn('minted_at');
-          }}
-        >
-          By Creation {orderColumn === 'minted_at' ? '*' : ''}
-        </Button>
-      </ButtonGroup>
+          platform={platform}
+        />
+      </Box>
       <TokenGrid tokens={tokens} />
     </div>
   );
