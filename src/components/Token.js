@@ -7,6 +7,14 @@ import Stack from '@mui/material/Stack';
 import Skeleton from '@mui/material/Skeleton';
 import { ipfsToCloudflareUri, getUsername, formatTz } from '../libs/utils';
 
+const PLATFORM_TO_COLOR = {
+  HEN: 'secondary',
+  OBJKT: 'info',
+  VERSUM: 'success',
+  FXHASH: 'warning',
+  '8BIDOU': 'error',
+};
+
 function getTokenLink(token) {
   switch (token.platform) {
     case 'HEN': {
@@ -60,6 +68,7 @@ export default function Token({ token }) {
               loading="lazy"
               style={{
                 position: isLoaded ? 'relative' : 'absolute',
+                top: 0,
                 display: 'block',
                 width: '100%',
                 opacity: isLoaded ? 1 : 0,
@@ -68,7 +77,7 @@ export default function Token({ token }) {
             {token.platform != null && (
               <Chip
                 label={token.platform === 'HEN' ? 'TEIA' : token.platform}
-                color="secondary"
+                color={PLATFORM_TO_COLOR[token.platform]}
                 size="small"
                 sx={{
                   pointerEvents: 'none',
