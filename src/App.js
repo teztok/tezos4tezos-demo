@@ -25,6 +25,7 @@ const TokensByTagsQuery = gql`
     tokens(where: { tags: { tag: { _in: $tags } }, editions: { _gt: "0" }, display_uri: { _is_null: false } }, order_by: [$orderBy]) {
       fa2_address
       token_id
+      platform
       editions
       sales_count
       artist_address
