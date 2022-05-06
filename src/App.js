@@ -15,6 +15,7 @@ import GitHubIcon from '@mui/icons-material/GitHub';
 import Select from '@mui/material/Select';
 import Stats from './components/Stats';
 import laggy from './libs/swr-laggy-middleware';
+import { ignorelist } from './libs/ignorelist';
 import PlatformFilters from './components/PlatformFilters';
 import TokenGrid from './components/TokenGrid';
 import theme from './theme';
@@ -110,7 +111,12 @@ function useTokensByTags(tags, orderColumn, platform, limit) {
   );
 
   return {
-    tokens: data && data.tokens,
+    tokens:
+      data &&
+      data.tokens.filter(
+        (token) =>
+          !ignorelist.some((ignoredToken) => ignoredToken.fa2_address === token.fa2_address && ignoredToken.token_id === token.token_id)
+      ),
     totalTokensCount: data && data.stats.aggregate.count,
     totalArtistsCount: data && data.stats.aggregate.artists_count,
     totalSalesCount: data && data.stats.aggregate.sum.sales_count,
@@ -132,7 +138,6 @@ function App() {
   const [limit, setLimit] = useState(DEFAULT_LIMIT);
   const platform = searchParams.get('platform') || '__ALL__';
 
-  //const [platform, setPlatform] = useState('__ALL__');
   const {
     tokens,
     totalSalesCount,
