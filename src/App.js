@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import useSWR from 'swr';
 import { request, gql } from 'graphql-request';
+import { createSearchParams, useNavigate, useSearchParams } from 'react-router-dom';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import Stack from '@mui/material/Stack';
@@ -125,9 +126,13 @@ function useTokensByTags(tags, orderColumn, platform, limit) {
 }
 
 function App() {
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const [orderColumn, setOrderColumn] = useState('minted_at');
   const [limit, setLimit] = useState(DEFAULT_LIMIT);
-  const [platform, setPlatform] = useState('__ALL__');
+  const platform = searchParams.get('platform') || '__ALL__';
+
+  //const [platform, setPlatform] = useState('__ALL__');
   const {
     tokens,
     totalSalesCount,
@@ -225,7 +230,7 @@ function App() {
         <PlatformFilters
           filters={[
             { label: 'ALL', value: '__ALL__', count: totalTokensCount },
-            { label: 'TEIA', value: 'HEN', count: teiaTokenCount },
+            { label: 'TEIA / HEN', value: 'HEN', count: teiaTokenCount },
             { label: 'OBJKT', value: 'OBJKT', count: objktTokenCount },
             { label: 'VERSUM', value: 'VERSUM', count: versumTokenCount },
             { label: 'FXHASH', value: 'FXHASH', count: fxhashTokenCount },
@@ -233,7 +238,15 @@ function App() {
           ]}
           onChange={(value) => {
             setLimit(DEFAULT_LIMIT);
-            setPlatform(value);
+            navigate({
+              pathname: '/',
+              search:
+                value !== '__ALL__'
+                  ? createSearchParams({
+                      platform: value,
+                    }).toString()
+                  : '',
+            });
           }}
           platform={platform}
         />
