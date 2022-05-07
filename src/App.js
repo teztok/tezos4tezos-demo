@@ -185,13 +185,21 @@ function App() {
             display: 'flex',
             alignItems: 'center',
             mb: 4,
+            [theme.breakpoints.down('tablet_portrait')]: {
+              display: 'block',
+            },
           }}
         >
           <Stack
             direction={{ tablet: 'row', tablet_short: 'row', tablet_portrait: 'column', mobile: 'column' }}
             alignItems={{ tablet: 'center', tablet_short: 'center', tablet_portrait: 'start', mobile: 'start' }}
             spacing={6}
-            sx={{ width: '75%' }}
+            sx={{
+              width: '75%',
+              [theme.breakpoints.down('tablet_portrait')]: {
+                width: '100%',
+              },
+            }}
           >
             <Typography variant="h1" component="h1" color="primary">
               #{TAG}
@@ -212,11 +220,23 @@ function App() {
               mr: 4,
               width: '25%',
               [theme.breakpoints.down('tablet_portrait')]: {
-                display: 'none !important',
+                width: '100%',
               },
             }}
           >
-            <FormControl sx={{ m: 1, mr: 4, ml: 'auto', minWidth: 120 }} size="small">
+            <FormControl
+              sx={{
+                m: 1,
+                mr: 4,
+                ml: 'auto',
+                minWidth: 120,
+                [theme.breakpoints.down('tablet_portrait')]: {
+                  mt: 4,
+                  ml: 0,
+                },
+              }}
+              size="small"
+            >
               <InputLabel>Sort by</InputLabel>
               <Select value={orderColumn} label="Sort by" onChange={(ev) => setOrderColumn(ev.target.value)}>
                 <MenuItem dense value="sales_count">
@@ -227,7 +247,14 @@ function App() {
                 </MenuItem>
               </Select>
             </FormControl>
-            <Link href="https://github.com/teztok/tezos4tezos-demo">
+            <Link
+              href="https://github.com/teztok/tezos4tezos-demo"
+              sx={{
+                [theme.breakpoints.down('tablet_portrait')]: {
+                  display: 'none !important',
+                },
+              }}
+            >
               <GitHubIcon />
             </Link>
           </Box>
