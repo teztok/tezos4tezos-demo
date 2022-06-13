@@ -15,13 +15,25 @@ const theme = createTheme({
   palette: {
     mode: 'dark',
     primary: {
-      main: '#939ef5',
+      main: '#6dddff',
     },
     secondary: {
-      main: '#f88dff',
+      main: '#FFFFFF',
     },
     background: {
       default: '#0b0f19',
+    },
+    info: {
+      main: '#FFFFFF',
+    },
+    success: {
+      main: '#FFFFFF',
+    },
+    warning: {
+      main: '#FFFFFF',
+    },
+    error: {
+      main: '#FFFFFF',
     },
   },
   components: {
