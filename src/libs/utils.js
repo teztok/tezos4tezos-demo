@@ -24,5 +24,5 @@ export function formatTz(amount) {
 
 export function ipfsToCloudflareUri(ipfsUri) {
   const ipfsHash = ipfsUri.replace('ipfs://', '');
-  return `https://cloudflare-ipfs.com/ipfs/${ipfsHash}`;
+  return `https://livefeed-api.teztok.com/asset/${ipfsHash}`;
 }
