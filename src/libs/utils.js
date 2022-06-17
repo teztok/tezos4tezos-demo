@@ -22,7 +22,7 @@ export function formatTz(amount) {
   return `${amountFixed.endsWith('.00') ? amountFixed.slice(0, -3) : amountFixed} ꜩ`;
 }
 
-export function ipfsToCloudflareUri(ipfsUri) {
+export function ipfsToGatewayUri(ipfsUri) {
   const ipfsHash = ipfsUri.replace('ipfs://', '');
-  return `https://cloudflare-ipfs.com/ipfs/${ipfsHash}`;
+  return `https://ipfs.io/ipfs/${ipfsHash}`;
 }

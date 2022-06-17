@@ -5,7 +5,7 @@ import Link from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
 import Stack from '@mui/material/Stack';
 import Skeleton from '@mui/material/Skeleton';
-import { ipfsToCloudflareUri, getUsername, formatTz } from '../libs/utils';
+import { ipfsToGatewayUri, getUsername, formatTz } from '../libs/utils';
 
 const PLATFORM_TO_COLOR = {
   HEN: 'secondary',
@@ -63,7 +63,7 @@ export default function Token({ token }) {
             <img
               onLoad={() => setIsLoaded(true)}
               className="artwork"
-              src={ipfsToCloudflareUri(token.display_uri)}
+              src={ipfsToGatewayUri(token.display_uri)}
               alt={token.name}
               loading="lazy"
               style={{
