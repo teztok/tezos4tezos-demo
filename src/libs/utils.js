@@ -25,7 +25,7 @@ export function formatTz(amount) {
 function getIpfsUri(token) {
   const platform = token.platform;
 
-  if (platform === 'HEN') {
+  if (platform === 'HEN' || platform === 'OBJKT') {
     return token.display_uri;
   }
 
