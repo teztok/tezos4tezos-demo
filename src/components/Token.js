@@ -5,7 +5,7 @@ import Link from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
 import Stack from '@mui/material/Stack';
 import Skeleton from '@mui/material/Skeleton';
-import { ipfsToGatewayUri, getUsername, formatTz } from '../libs/utils';
+import { getPreviewImage, getUsername, formatTz } from '../libs/utils';
 
 const PLATFORM_TO_COLOR = {
   HEN: 'secondary',
@@ -13,6 +13,7 @@ const PLATFORM_TO_COLOR = {
   VERSUM: 'success',
   FXHASH: 'warning',
   '8BIDOU': 'error',
+  TYPED: 'primary',
 };
 
 function getTokenLink(token) {
@@ -25,6 +26,9 @@ function getTokenLink(token) {
     }
     case 'VERSUM': {
       return `https://versum.xyz/token/versum/${token.token_id}`;
+    }
+    case 'TYPED': {
+      return `https://typed.art/${token.token_id}`;
     }
     case '8BIDOU': {
       if (token.fa2_address === 'KT1MxDwChiDwd6WBVs24g1NjERUoK622ZEFp') {
@@ -63,7 +67,7 @@ export default function Token({ token }) {
             <img
               onLoad={() => setIsLoaded(true)}
               className="artwork"
-              src={ipfsToGatewayUri(token.display_uri)}
+              src={getPreviewImage(token)}
               alt={token.name}
               loading="lazy"
               style={{
@@ -99,6 +103,11 @@ export default function Token({ token }) {
                 <strong>Sales</strong>
                 <br />
                 {token.sales_count}
+              </Typography>
+              <Typography variant="body2" component="p">
+                <strong>Volume</strong>
+                <br />
+                {formatTz(token.sales_volume)}
               </Typography>
               <Typography variant="body2" component="p">
                 <strong>Price</strong>

@@ -22,12 +22,15 @@ import theme from './theme';
 import './App.css';
 
 const TAG = process.env.REACT_APP_TAG || 'tezos4tezos';
+const ADDITIONAL_GRAPHQL_WHERE_CONDITIONS = process.env.REACT_APP_ADDITIONAL_GRAPHQL_WHERE_CONDITIONS;
 const TEZTOK_API = 'https://api.teztok.com/v1/graphql';
 const DEFAULT_LIMIT = 30;
 
+let additionalWhereConditions = ADDITIONAL_GRAPHQL_WHERE_CONDITIONS ? `, ${ADDITIONAL_GRAPHQL_WHERE_CONDITIONS}` : '';
+
 const TokensByTagsQuery = gql`
   query TokensByTags($tags: [String], $orderBy: tokens_order_by!, $platform: String_comparison_exp!, $limit: Int!) {
-    stats: tokens_aggregate(where: { tags: { tag: { _in: $tags } }, display_uri: { _is_null: false } }) {
+    stats: tokens_aggregate(where: { tags: { tag: { _in: $tags } }, display_uri: { _is_null: false } ${additionalWhereConditions} }) {
       aggregate {
         count
         artists_count: count(distinct: true, columns: artist_address)
@@ -37,39 +40,46 @@ const TokensByTagsQuery = gql`
         }
       }
     }
-    stats_teia: tokens_aggregate(where: { tags: { tag: { _in: $tags } }, display_uri: { _is_null: false }, platform: { _eq: "HEN" } }) {
+    stats_teia: tokens_aggregate(where: { tags: { tag: { _in: $tags } }, display_uri: { _is_null: false }, platform: { _eq: "HEN" } ${additionalWhereConditions} }) {
       aggregate {
         count
       }
     }
-    stats_objkt: tokens_aggregate(where: { tags: { tag: { _in: $tags } }, display_uri: { _is_null: false }, platform: { _eq: "OBJKT" } }) {
+    stats_objkt: tokens_aggregate(where: { tags: { tag: { _in: $tags } }, display_uri: { _is_null: false }, platform: { _eq: "OBJKT" } ${additionalWhereConditions} }) {
       aggregate {
         count
       }
     }
     stats_versum: tokens_aggregate(
-      where: { tags: { tag: { _in: $tags } }, display_uri: { _is_null: false }, platform: { _eq: "VERSUM" } }
+      where: { tags: { tag: { _in: $tags } }, display_uri: { _is_null: false }, platform: { _eq: "VERSUM" } ${additionalWhereConditions} }
     ) {
       aggregate {
         count
       }
     }
     stats_8bidou: tokens_aggregate(
-      where: { tags: { tag: { _in: $tags } }, display_uri: { _is_null: false }, platform: { _eq: "8BIDOU" } }
+      where: { tags: { tag: { _in: $tags } }, display_uri: { _is_null: false }, platform: { _eq: "8BIDOU" } ${additionalWhereConditions} }
     ) {
       aggregate {
         count
       }
     }
     stats_fxhash: tokens_aggregate(
-      where: { tags: { tag: { _in: $tags } }, display_uri: { _is_null: false }, platform: { _eq: "FXHASH" } }
+      where: { tags: { tag: { _in: $tags } }, display_uri: { _is_null: false }, platform: { _eq: "FXHASH" } ${additionalWhereConditions} }
+    ) {
+      aggregate {
+        count
+      }
+    }
+    stats_typed: tokens_aggregate(
+      where: { tags: { tag: { _in: $tags } }, display_uri: { _is_null: false }, platform: { _eq: "TYPED" } ${additionalWhereConditions} }
     ) {
       aggregate {
         count
       }
     }
     tokens(
-      where: { tags: { tag: { _in: $tags } }, editions: { _gt: "0" }, display_uri: { _is_null: false }, platform: $platform }
+      where: { tags: { tag: { _in: $tags } }, editions: { _gt: "0" }, display_uri: { _is_null: false }, platform: $platform ${additionalWhereConditions} }
       limit: $limit
       order_by: [$orderBy]
     ) {
@@ -78,12 +88,15 @@ const TokensByTagsQuery = gql`
       platform
       editions
       sales_count
+      sales_volume
       artist_address
       artist_profile {
         twitter
         alias
       }
       display_uri
+      thumbnail_uri
+      fx_collection_thumbnail_uri
       name
       description
       mime_type
@@ -126,6 +139,7 @@ function useTokensByTags(tags, orderColumn, platform, limit) {
     versumTokenCount: data && data.stats_versum.aggregate.count,
     eightbidouTokenCount: data && data.stats_8bidou.aggregate.count,
     fxhashTokenCount: data && data.stats_fxhash.aggregate.count,
+    typedTokenCount: data && data.stats_typed.aggregate.count,
     error,
     isLoading: isValidating,
   };
@@ -149,6 +163,7 @@ function App() {
     versumTokenCount,
     eightbidouTokenCount,
     fxhashTokenCount,
+    typedTokenCount,
     error,
   } = useTokensByTags([TAG, `#${TAG}`], orderColumn, platform, limit);
 
@@ -242,6 +257,9 @@ function App() {
                 <MenuItem dense value="sales_count">
                   Sales
                 </MenuItem>
+                <MenuItem dense value="sales_volume">
+                  Volume
+                </MenuItem>
                 <MenuItem dense value="minted_at">
                   Minted
                 </MenuItem>
@@ -267,6 +285,7 @@ function App() {
             { label: 'VERSUM', value: 'VERSUM', count: versumTokenCount },
             { label: 'FXHASH', value: 'FXHASH', count: fxhashTokenCount },
             { label: '8BIDOU', value: '8BIDOU', count: eightbidouTokenCount },
+            { label: 'TYPED', value: 'TYPED', count: typedTokenCount },
           ]}
           onChange={(value) => {
             setLimit(DEFAULT_LIMIT);

@@ -22,7 +22,36 @@ export function formatTz(amount) {
   return `${amountFixed.endsWith('.00') ? amountFixed.slice(0, -3) : amountFixed} ꜩ`;
 }
 
-export function ipfsToGatewayUri(ipfsUri) {
+function getIpfsUri(token) {
+  const platform = token.platform;
+
+  if (platform === 'HEN') {
+    return token.display_uri;
+  }
+
+  if (
+    platform === 'FXHASH' &&
+    token.thumbnail_uri === 'ipfs://QmbvEAn7FLMeYBDroYwBP8qWc3d3VVWbk19tTB83LCMB5S' &&
+    token.fx_collection_thumbnail_uri
+  ) {
+    return token.fx_collection_thumbnail_uri;
+  }
+
+  return token.thumbnail_uri;
+}
+
+export function getPreviewImage(token) {
+  const ipfsUri = getIpfsUri(token);
+
+  if (!ipfsUri) {
+    return null; // TODO: placeholder image
+  }
+
   const ipfsHash = ipfsUri.replace('ipfs://', '');
+
+  if (token.platform === 'FXHASH') {
+    return `https://gateway.fxhash.xyz/ipfs/${ipfsHash}`;
+  }
+
   return `https://ipfs.io/ipfs/${ipfsHash}`;
 }
