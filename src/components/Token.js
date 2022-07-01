@@ -91,9 +91,20 @@ export default function Token({ token }) {
                 }}
               />
             )}
+            <Chip
+                label={getUsername(token, 'artist')}
+                color="primary"
+                size="small"
+                sx={{ 
+                  pointerEvents: 'none', 
+                  position: 'absolute',
+                  top: 20,
+                  right: 20,
+                }}
+              />
           </Box>
           <Box sx={{ p: 3 }}>
-            <Stack direction="row" spacing={2} alignItems="center">
+            <Stack direction="row" spacing={3} alignItems="center">
               <Typography variant="body2" component="p">
                 <strong>Editions</strong>
                 <br />
@@ -114,12 +125,6 @@ export default function Token({ token }) {
                 <br />
                 {formatTz(token.price)}
               </Typography>
-              <Chip
-                label={getUsername(token, 'artist')}
-                color="primary"
-                size="small"
-                sx={{ pointerEvents: 'none', ml: 'auto !important' }}
-              />
             </Stack>
           </Box>
         </Link>
