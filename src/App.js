@@ -114,7 +114,7 @@ function useTokensByTags(tags, orderColumn, platform, limit) {
         tags,
         platform: platform === '__ALL__' ? {} : { _eq: platform },
         limit,
-        orderBy: { [orderColumn]: 'desc' },
+        orderBy: { [orderColumn]: 'desc_nulls_last' },
       }),
     {
       revalidateIfStale: false,
