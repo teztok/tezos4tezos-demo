@@ -92,16 +92,16 @@ export default function Token({ token }) {
               />
             )}
             <Chip
-                label={getUsername(token, 'artist')}
-                color="primary"
-                size="small"
-                sx={{ 
-                  pointerEvents: 'none', 
-                  position: 'absolute',
-                  top: 20,
-                  right: 20,
-                }}
-              />
+              label={getUsername(token, 'artist')}
+              color="primary"
+              size="small"
+              sx={{
+                pointerEvents: 'none',
+                position: 'absolute',
+                top: 20,
+                right: 20,
+              }}
+            />
           </Box>
           <Box sx={{ p: 3 }}>
             <Stack direction="row" spacing={3} alignItems="center">

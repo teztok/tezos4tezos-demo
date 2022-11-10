@@ -165,7 +165,7 @@ function App() {
     fxhashTokenCount,
     typedTokenCount,
     error,
-  } = useTokensByTags([TAG, `#${TAG}`], orderColumn, platform, limit);
+  } = useTokensByTags([...TAG.split(' ').flatMap((tag) => [tag, `#${tag}`])], orderColumn, platform, limit);
 
   if (error) {
     return <pre>{JSON.stringify(error, null, 2)}</pre>;
@@ -217,7 +217,9 @@ function App() {
             }}
           >
             <Typography variant="h1" component="h1" color="primary">
-              #{TAG}
+              {TAG.split(' ')
+                .map((tag) => `#${tag}`)
+                .join(' ')}
             </Typography>
             <Box sx={{ mt: '0 !important' }}>
               <Stats
